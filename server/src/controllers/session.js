@@ -38,7 +38,7 @@ async function verifySession(req, res, next) {
 
   res.status(401).json({
     success: false,
-    message: "UnAutherized Access",
+    message: "Unauthorized Access",
   });
 }
 

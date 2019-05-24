@@ -17,10 +17,15 @@
 # Login Page for normal user
     http://localhost:3000
 # Login Page for admin user
-    http://localhost:3000/admin/login
-    user: admin@domain.in  
-    pass: 987654321@qQ
-
+<pre>
+Link: <a href="http://localhost:3000/admin/login">http://localhost:3000/admin/login</a>
+user: admin@domain.in  
+pass: 987654321@qQ
+</pre>
+# For Postman API Documentation
+    1. Install Postman Rest Client
+    2. Open Postman > Import the following document
+        server\Calorie-Tracker.postman_collection.json
 # Folder Structure
 
 <pre>

@@ -8,7 +8,7 @@ async function adminFilter(req, res, next) {
         console.error('Session Id Missing in authFilter().');
         return res.status(401).json({
             success: false,
-            message: 'UnAutherized Access'
+            message: 'Unauthorized Access'
         });
     }
 
@@ -26,7 +26,7 @@ async function adminFilter(req, res, next) {
 
     return res.status(401).json({
         success: false,
-        message: 'UnAutherized Access'
+        message: 'Unauthorized Access'
     });
 }
 
@@ -37,7 +37,7 @@ async function userFilter(req, res, next) {
         console.error('Session Id Missing in userFilter().');
         return res.status(401).json({
             success: false,
-            message: 'UnAutherized Access'
+            message: 'Unauthorized Access'
         });
     }
 
@@ -56,7 +56,7 @@ async function userFilter(req, res, next) {
 
     return res.status(401).json({
         success: false,
-        message: 'UnAutherized Access'
+        message: 'Unauthorized Access'
     });
 }
 

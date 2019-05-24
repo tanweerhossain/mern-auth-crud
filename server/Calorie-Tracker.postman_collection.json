@@ -1,10 +1,486 @@
 {
 	"info": {
-		"_postman_id": "d31d0614-9da2-4505-983a-c4c2080b530d",
+		"_postman_id": "c7c3c46a-2eda-4c06-ae54-3116df1d62f3",
 		"name": "Calorie-Tracker",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
+		{
+			"name": "saveUserProfile",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"email1@domain.in\",\n  \"password\": \"Abc@1234\",\n  \"name\": \"User1\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/user/profile/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"user",
+						"profile",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fetchAllUsers",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/** Fetch All User Details */\r",
+							"function fetchAllUsers() {\r",
+							"    if (pm.collectionVariables.get(\"allUsers\")) return;\r",
+							"    pm.sendRequest({\r",
+							"            url: \"http://localhost:2000/ajax/admin/fetch/users\",\r",
+							"            method: 'GET',\r",
+							"            header: {\r",
+							"                'Content-Type': 'application/json',\r",
+							"                'sessionId': pm.collectionVariables.get('adminsessionid')\r",
+							"            }\r",
+							"        }, function (err, response) {\r",
+							"            const { success, body } = response.json();\r",
+							"\r",
+							"            if (success) {\r",
+							"                pm.collectionVariables.set(\"allUsers\", JSON.stringify(body));\r",
+							"            } \r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"/** Call Fetch All User Details */\r",
+							"fetchAllUsers();"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "sessionId",
+						"value": "{{adminsessionid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/admin/fetch/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"admin",
+						"fetch",
+						"users"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "toggleUserActive",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (pm.collectionVariables.get('allUsers')) {\r",
+							"    const allUsers = JSON.parse(pm.collectionVariables.get('allUsers'));\r",
+							"    allUsers.forEach(user => {\r",
+							"        if (user.userEmail === pm.collectionVariables.get('userEmail')) {\r",
+							"            pm.variables.set(\"randomUserId\", user._id);\r",
+							"        }\r",
+							"    })\r",
+							"}\r",
+							"\r",
+							"    \r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "sessionId",
+						"value": "{{adminsessionid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"_id\": \"{{randomUserId}}\",\n\t\"isActive\": true\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/admin/toggle/user/active",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"admin",
+						"toggle",
+						"user",
+						"active"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createUserSession",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (pm.collectionVariables.get('allUsers')) {\r",
+							"    const allUsers = JSON.parse(pm.collectionVariables.get('allUsers'));\r",
+							"    const userCount = Array.isArray(allUsers) ? allUsers.length : 0;\r",
+							"    const randomIndex = Math.round(Math.random() * (userCount - 1));\r",
+							"    \r",
+							"    pm.variables.set(\"randomUserId\", allUsers[randomIndex]._id);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "sessionid",
+						"value": "{{adminsessionid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"_id\": \"{{randomUserId}}\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/admin/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"admin",
+						"user",
+						"login"
+					]
+				},
+				"description": "> Create User session by using admin session id"
+			},
+			"response": []
+		},
+		{
+			"name": "fetchUserSession",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"/** Create User Session */\r",
+							"function createSession(email, pass, role = 'USER') {\r",
+							"    switch (role) {\r",
+							"        case 'USER': {\r",
+							"            if (pm.collectionVariables.get(\"sessionid\")) return;\r",
+							"            break;\r",
+							"        }\r",
+							"        case 'ADMIN': {\r",
+							"            if (pm.collectionVariables.get(\"adminsessionid\")) return;\r",
+							"            break;\r",
+							"        }\r",
+							"    }\r",
+							"    pm.sendRequest({\r",
+							"        url: `http://localhost:2000/ajax/${role.toLocaleLowerCase()}/login`,\r",
+							"        method: \"POST\",\r",
+							"        header: {\r",
+							"            'Content-Type': 'application/json' \r",
+							"        },\r",
+							"        body: {\r",
+							"            mode: 'raw',\r",
+							"            raw: JSON.stringify({\r",
+							"                \"email\": email,\r",
+							"                \"password\": pass\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, response) {\r",
+							"        const { success, body } = response.json();\r",
+							"        \r",
+							"        if (success) {\r",
+							"            switch (role) {\r",
+							"                case 'USER': {\r",
+							"                    pm.collectionVariables.set(\"sessionid\", body);\r",
+							"                    break;\r",
+							"                }\r",
+							"                case 'ADMIN': {\r",
+							"                    pm.collectionVariables.set(\"adminsessionid\", body);\r",
+							"                    break;\r",
+							"                }\r",
+							"            }\r",
+							"        } \r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"/** Call Create User Session */\r",
+							"createSession(pm.collectionVariables.get(\"userEmail\"), pm.collectionVariables.get(\"userPassword\"));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"email1@domain.com\",\n  \"password\": \"Abc@1234\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "example1",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"email1@domain.com\",\n  \"password\": \"Abc@1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:2000/ajax/user/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "2000",
+							"path": [
+								"ajax",
+								"user",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "75"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"4b-oDidDtsRcUKpE/+uls6YzuHzyW0\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Aug 2021 16:42:01 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"body\": \"1ad0a180-200c-4e6b-b548-e2678e576f0b1627836121983\"\n}"
+				}
+			]
+		},
+		{
+			"name": "fetchUserProfile",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "sessionid",
+						"value": "{{sessionid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/user/profile/fetch",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"user",
+						"profile",
+						"fetch"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateUserProfile",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "sessionid",
+						"value": "{{sessionid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"User123\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/user/profile/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"user",
+						"profile",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
 		{
 			"name": "addMeal",
 			"request": {
@@ -17,7 +493,7 @@
 					},
 					{
 						"key": "sessionid",
-						"value": "48ec05ae-c8fc-4cc0-97a6-8d73ecbf20781588110609395",
+						"value": "{{sessionid}}",
 						"type": "text"
 					}
 				],
@@ -42,7 +518,296 @@
 			"response": []
 		},
 		{
+			"name": "fetchMeal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/** Fetch All User Details */\r",
+							"function fetchAllMealsOfSessionizedUser() {\r",
+							"    pm.sendRequest({\r",
+							"            url: \"http://localhost:2000/ajax/meal/fetch?minRange=2020/02/12&maxRange=2021/12/01\",\r",
+							"            method: 'GET',\r",
+							"            header: {\r",
+							"                'Content-Type': 'application/json',\r",
+							"                'sessionId': pm.collectionVariables.get('sessionid')\r",
+							"            }\r",
+							"        }, function (err, response) {\r",
+							"            const { success, body } = response.json();\r",
+							"\r",
+							"            if (success) {\r",
+							"                pm.collectionVariables.set(\"allMealsOfSessionizedUser\", JSON.stringify(body));\r",
+							"            } \r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"/** Call Fetch All Meal Details */\r",
+							"fetchAllMealsOfSessionizedUser();"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "sessionid",
+						"value": "{{sessionid}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"mealName\": \"Fruit\",\n  \"mealCalories\": 780,\n  \"mealDate\": \"2021/11/01\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/meal/fetch?minRange=2020/02/12&maxRange=2021/12/01",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"meal",
+						"fetch"
+					],
+					"query": [
+						{
+							"key": "minRange",
+							"value": "2020/02/12"
+						},
+						{
+							"key": "maxRange",
+							"value": "2021/12/01"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "verifySession",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:2000/ajax/verify/session?sessionId={{sessionid}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2000",
+					"path": [
+						"ajax",
+						"verify",
+						"session"
+					],
+					"query": [
+						{
+							"key": "sessionId",
+							"value": "{{sessionid}}"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "verifyAdminSession",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:2000/ajax/verify/session?sessionId={{adminsessionid}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "2000",
+							"path": [
+								"ajax",
+								"verify",
+								"session"
+							],
+							"query": [
+								{
+									"key": "sessionId",
+									"value": "{{adminsessionid}}"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "115"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"73-LUNx4xP7R3XzSTehDoES0dxF74o\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Aug 2021 23:38:45 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"body\": {\n        \"sessionId\": \"38a2a594-11d1-4c0f-8571-5f08b52a15821627861125689\",\n        \"role\": \"ADMIN-SESSION-ID\"\n    }\n}"
+				},
+				{
+					"name": "verifyUserSession",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:2000/ajax/verify/session?sessionId={{sessionid}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "2000",
+							"path": [
+								"ajax",
+								"verify",
+								"session"
+							],
+							"query": [
+								{
+									"key": "sessionId",
+									"value": "{{sessionid}}"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Powered-By",
+							"value": "Express"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "114"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"72-VxqEK5QO8zFVlbUh3TGU8ErH/Bw\""
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 01 Aug 2021 23:39:41 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"body\": {\n        \"sessionId\": \"fbd4d448-ac4f-4852-9df5-ba6d21ad9ae21627861181209\",\n        \"role\": \"USER-SESSION-ID\"\n    }\n}"
+				}
+			]
+		},
+		{
 			"name": "updateMeal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (pm.collectionVariables.get('allMealsOfSessionizedUser')) {\r",
+							"    const allMealsOfSessionizedUser = JSON.parse(pm.collectionVariables.get('allMealsOfSessionizedUser'));\r",
+							"    const userCount = Array.isArray(allMealsOfSessionizedUser) ? allMealsOfSessionizedUser.length : 0;\r",
+							"    const randomIndex = Math.round(Math.random() * (userCount - 1));\r",
+							"    \r",
+							"    pm.variables.set(\"randomMealId\", allMealsOfSessionizedUser[randomIndex]._id);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "PUT",
 				"header": [
@@ -53,13 +818,13 @@
 					},
 					{
 						"key": "sessionid",
-						"value": "12538b5c-15f0-4466-ae28-288c92356e171588112016048",
+						"value": "{{sessionid}}",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"_id\": \"5ea8a56175e94173886c7267\",\n  \"mealName\": \"Banana3\",\n  \"mealCalories\": 85.3,\n  \"mealDate\": \"2020/04/12\"\n}"
+					"raw": "{\n    \"_id\": \"{{randomMealId}}\",\n    \"mealName\": \"Banana3\",\n    \"mealCalories\": 85.3,\n    \"mealDate\": \"2020/04/12\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:2000/ajax/meal/update",
@@ -79,6 +844,24 @@
 		},
 		{
 			"name": "deleteMeal",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (pm.collectionVariables.get('allMealsOfSessionizedUser')) {\r",
+							"    const allMealsOfSessionizedUser = JSON.parse(pm.collectionVariables.get('allMealsOfSessionizedUser'));\r",
+							"    const userCount = Array.isArray(allMealsOfSessionizedUser) ? allMealsOfSessionizedUser.length : 0;\r",
+							"    const randomIndex = Math.round(Math.random() * (userCount - 1));\r",
+							"    \r",
+							"    pm.variables.set(\"randomMealId\", allMealsOfSessionizedUser[randomIndex]._id);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "DELETE",
 				"header": [
@@ -89,7 +872,7 @@
 					},
 					{
 						"key": "sessionid",
-						"value": "12538b5c-15f0-4466-ae28-288c92356e171588112016048",
+						"value": "{{sessionid}}",
 						"type": "text"
 					}
 				],
@@ -98,7 +881,7 @@
 					"raw": "{\n\t\"_id\": \"5ea76d757a425d73fd04479e\",\n  \"mealName\": \"Banana3\",\n  \"mealCalories\": 85.3,\n  \"mealDate\": \"05/01/2020\"\n}"
 				},
 				"url": {
-					"raw": "http://localhost:2000/ajax/meal/remove/5ea76d757a425d73fd04479e",
+					"raw": "http://localhost:2000/ajax/meal/remove/{{randomMealId}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -108,14 +891,14 @@
 						"ajax",
 						"meal",
 						"remove",
-						"5ea76d757a425d73fd04479e"
+						"{{randomMealId}}"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "fetchMeal",
+			"name": "userLogout",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -129,16 +912,16 @@
 					},
 					{
 						"key": "sessionid",
-						"value": "12538b5c-15f0-4466-ae28-288c92356e171588112016048",
+						"value": "{{sessionid}}",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"mealName\": \"Fruit\",\n  \"mealCalories\": 780,\n  \"mealDate\": \"2021/11/01\"\n}"
+					"raw": "{\n\t\"_id\": \"5ea8627343797539c5496a8c\"\n}"
 				},
 				"url": {
-					"raw": "http://localhost:2000/ajax/meal/fetch?minRange=2020/04/12&maxRange=2021/12/01",
+					"raw": "http://localhost:2000/ajax/user/logout",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -146,25 +929,15 @@
 					"port": "2000",
 					"path": [
 						"ajax",
-						"meal",
-						"fetch"
-					],
-					"query": [
-						{
-							"key": "minRange",
-							"value": "2020/04/12"
-						},
-						{
-							"key": "maxRange",
-							"value": "2021/12/01"
-						}
+						"user",
+						"logout"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "fetchAllUsers",
+			"name": "adminLogout",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -177,17 +950,17 @@
 						"type": "text"
 					},
 					{
-						"key": "sessionId",
-						"value": "aafb5748-a89a-4bf6-9867-6d5814d1102d1588109896329",
+						"key": "sessionid",
+						"value": "{{adminsessionid}}",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"admin@domain.in\",\n  \"password\": \"987654321@qQ\"\n}"
+					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:2000/ajax/admin/fetch/users",
+					"raw": "http://localhost:2000/ajax/admin/logout",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -196,15 +969,7 @@
 					"path": [
 						"ajax",
 						"admin",
-						"fetch",
-						"users"
-					],
-					"query": [
-						{
-							"key": "",
-							"value": "",
-							"disabled": true
-						}
+						"logout"
 					]
 				}
 			},
@@ -240,335 +1005,106 @@
 				}
 			},
 			"response": []
-		},
-		{
-			"name": "fetchUserSession",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"email\": \"abc@gmail.com\",\n  \"password\": \"987654321@qQ\"\n}"
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/user/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"user",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "fetchUserProfile",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "sessionid",
-						"value": "12538b5c-15f0-4466-ae28-288c92356e171588112016048",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/user/profile/fetch",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"user",
-						"profile",
-						"fetch"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "updateUserProfile",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "sessionid",
-						"value": "c4a2b55f-9801-4891-98e3-02502ac0602d1588112820770",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"name\": \"User123\"\n}"
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/user/profile/update",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"user",
-						"profile",
-						"update"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "saveUserProfile",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"email\": \"ab.c.d@gmail.com\",\n  \"password\": \"987654321@qQ112\",\n  \"name\": \"user3\"\n}"
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/user/profile/signup",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"user",
-						"profile",
-						"signup"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "createUserSession",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"_id\": \"5ea8627343797539c5496a8c\"\n}"
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/admin/user/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"admin",
-						"user",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "toggleUserActive",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "sessionId",
-						"value": "13a0c563-2a8a-4225-8d74-eecd48074f101588110108982",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"_id\": \"5ea8627343797539c5496a8c\",\n\t\"isActive\": true\n}"
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/admin/toggle/user/active",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"admin",
-						"toggle",
-						"user",
-						"active"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "verifySession",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/verify/session?sessionId=bfbe75fe-0d17-48a0-9571-45d529e076bd1588105619642",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"verify",
-						"session"
-					],
-					"query": [
-						{
-							"key": "sessionId",
-							"value": "bfbe75fe-0d17-48a0-9571-45d529e076bd1588105619642"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "adminLogout",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "sessionid",
-						"value": "52c4ba05-b90f-4296-a9f3-bd24b56cb36b1588110499320",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"_id\": \"5ea8627343797539c5496a8c\"\n}"
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/admin/logout",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"admin",
-						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "userLogout",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "sessionid",
-						"value": "ca201b9e-c210-4fbd-b022-d2b8bb99340e1588113021290",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"_id\": \"5ea8627343797539c5496a8c\"\n}"
-				},
-				"url": {
-					"raw": "http://localhost:2000/ajax/user/logout",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "2000",
-					"path": [
-						"ajax",
-						"user",
-						"logout"
-					]
-				}
-			},
-			"response": []
 		}
 	],
-	"protocolProfileBehavior": {}
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"/** Create User Session */",
+					"function createSession(email, pass, role = 'USER') {",
+					"    switch (role) {",
+					"        case 'USER': {",
+					"            if (pm.collectionVariables.get(\"sessionid\")) return;",
+					"            break;",
+					"        }",
+					"        case 'ADMIN': {",
+					"            if (pm.collectionVariables.get(\"adminsessionid\")) return;",
+					"            break;",
+					"        }",
+					"    }",
+					"    pm.sendRequest({",
+					"        url: `http://localhost:2000/ajax/${role.toLocaleLowerCase()}/login`,",
+					"        method: \"POST\",",
+					"        header: {",
+					"            'Content-Type': 'application/json' ",
+					"        },",
+					"        body: {",
+					"            mode: 'raw',",
+					"            raw: JSON.stringify({",
+					"                \"email\": email,",
+					"                \"password\": pass",
+					"            })",
+					"        }",
+					"    }, function (err, response) {",
+					"        const { success, body } = response.json();",
+					"        ",
+					"        if (success) {",
+					"            switch (role) {",
+					"                case 'USER': {",
+					"                    pm.collectionVariables.set(\"sessionid\", body);",
+					"                    break;",
+					"                }",
+					"                case 'ADMIN': {",
+					"                    pm.collectionVariables.set(\"adminsessionid\", body);",
+					"                    break;",
+					"                }",
+					"            }",
+					"        } ",
+					"    });",
+					"}",
+					"",
+					"/** Call Create Admin Session */",
+					"createSession(pm.collectionVariables.get(\"adminEmail\"), pm.collectionVariables.get(\"adminPassword\"), 'ADMIN');",
+					"/** Call Create User Session */",
+					"createSession(pm.collectionVariables.get(\"userEmail\"), pm.collectionVariables.get(\"userPassword\"));"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "userEmail",
+			"value": "email1@domain.in"
+		},
+		{
+			"key": "userPassword",
+			"value": "Abc@1234"
+		},
+		{
+			"key": "adminEmail",
+			"value": "admin@domain.in"
+		},
+		{
+			"key": "adminPassword",
+			"value": "987654321@qQ"
+		},
+		{
+			"key": "adminsessionid",
+			"value": ""
+		},
+		{
+			"key": "sessionid",
+			"value": ""
+		},
+		{
+			"key": "allUsers",
+			"value": ""
+		},
+		{
+			"key": "allMealsOfSessionizedUser",
+			"value": ""
+		}
+	]
 }

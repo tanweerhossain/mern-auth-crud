@@ -86,7 +86,7 @@ class Home extends Component {
     const mealsData = {};
 
     if (listOfMeals && Array.isArray(listOfMeals)) {
-      listOfMeals.map(meal => {
+      listOfMeals.forEach(meal => {
         if (typeof mealsData[meal.mealDate] === 'undefined')
           mealsData[meal.mealDate] = {
             list: [meal],

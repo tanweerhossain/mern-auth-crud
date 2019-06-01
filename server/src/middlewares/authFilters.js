@@ -1,11 +1,12 @@
 const { getNodeCache } = require('./cachingModule');
 const nconf = require('../conf');
+const log = require('../../utils/logging');
 
 async function adminFilter(req, res, next) {
     const sessionId = req.headers.sessionid;
 
     if (!sessionId) {
-        console.error('Session Id Missing in authFilter().');
+        log.error('Session Id Missing in authFilter().');
         return res.status(401).json({
             success: false,
             message: 'Unauthorized Access'
@@ -13,7 +14,7 @@ async function adminFilter(req, res, next) {
     }
 
     if (sessionId === getNodeCache(nconf.get('ADMIN_SESSION_ID'))) {
-        console.info('ADMIN Session Verified Successfully in authFilter().');
+        log.info('ADMIN Session Verified Successfully in authFilter().');
         req.metaData = {
             role: 'ADMIN',
             sessionId: getNodeCache(nconf.get('ADMIN_SESSION_ID'))
@@ -22,7 +23,7 @@ async function adminFilter(req, res, next) {
     }
 
 
-    console.error('Session Expired in authFilter().');
+    log.error('Session Expired in authFilter().');
 
     return res.status(401).json({
         success: false,
@@ -34,7 +35,7 @@ async function userFilter(req, res, next) {
     const sessionId = req.headers.sessionid;
 
     if (!sessionId) {
-        console.error('Session Id Missing in userFilter().');
+        log.error('Session Id Missing in userFilter().');
         return res.status(401).json({
             success: false,
             message: 'Unauthorized Access'
@@ -42,7 +43,7 @@ async function userFilter(req, res, next) {
     }
 
     if (getNodeCache(sessionId)) {
-        console.info('USER Session Verified Successfully in userFilter().');
+        log.info('USER Session Verified Successfully in userFilter().');
         req.metaData = {
             role: 'USER',
             _id: getNodeCache(sessionId),
@@ -52,7 +53,7 @@ async function userFilter(req, res, next) {
     }
 
 
-    console.error('Session Expired in userFilter().');
+    log.error('Session Expired in userFilter().');
 
     return res.status(401).json({
         success: false,

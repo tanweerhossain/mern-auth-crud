@@ -1,4 +1,5 @@
 const Meal = require('../models/meal.model');
+const log = require('../../utils/logging');
 
 async function saveMealTransaction(data, userId) {
     try {
@@ -10,13 +11,13 @@ async function saveMealTransaction(data, userId) {
         });
 
         if(!result) {
-            console.error('Failure in saveMealTransaction().');
+            log.error('Failure in saveMealTransaction().');
             return null;
         }
-        console.info('Successfully executed saveMealTransaction() : ', !!result);
+        log.info('Successfully executed saveMealTransaction() : ', !!result);
         return result && result.toJSON();
     } catch (error) {
-        console.error('Failure in saveMealTransaction() : ', error);
+        log.error('Failure in saveMealTransaction() : ', error);
         return null;
     }
 }
@@ -35,13 +36,13 @@ async function updateMealTransaction(data, userId) {
         });
 
         if(!result) {
-            console.error('Failure in updateMealTransaction().');
+            log.error('Failure in updateMealTransaction().');
             return null;
         }
-        console.info('Successfully executed updateMealTransaction() : ', !!result);
+        log.info('Successfully executed updateMealTransaction() : ', !!result);
         return result && result.toJSON();
     } catch (error) {
-        console.error('Failure in updateMealTransaction() : ', error);
+        log.error('Failure in updateMealTransaction() : ', error);
         return null;
     }
 }
@@ -54,13 +55,13 @@ async function deleteMealTransaction(data, userId) {
         });
 
         if(!result) {
-            console.error('Failure in deleteMealTransaction().');
+            log.error('Failure in deleteMealTransaction().');
             return null;
         }
-        console.info('Successfully executed deleteMealTransaction() : ', !!result);
+        log.info('Successfully executed deleteMealTransaction() : ', !!result);
         return result && result.ok;
     } catch (error) {
-        console.error('Failure in deleteMealTransaction() : ', error);
+        log.error('Failure in deleteMealTransaction() : ', error);
         return null;
     }
 }
@@ -76,13 +77,13 @@ async function fetchMealTransaction(dateRange, userId) {
         }).sort({ mealDate: -1 });
 
         if(!Array.isArray(result)) {
-            console.error('Failure in fetchMealTransaction().');
+            log.error('Failure in fetchMealTransaction().');
             return null;
         }
-        console.info('Successfully executed fetchMealTransaction() : ', result && result.length);
+        log.info('Successfully executed fetchMealTransaction() : ', result && result.length);
         return result && result.map(e => e.toJSON());
     } catch (error) {
-        console.error('Failure in fetchMealTransaction() : ', error);
+        log.error('Failure in fetchMealTransaction() : ', error);
         return null;
     }
 }

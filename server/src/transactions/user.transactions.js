@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const moment = require('moment');
 const User = require('../models/user.model');
 const { setNodeCache } = require('../middlewares/cachingModule');
+const log = require('../../utils/logging');
 
 async function fetchAllUsersTransaction(dateRange, user = null) {
     try {
@@ -13,13 +14,13 @@ async function fetchAllUsersTransaction(dateRange, user = null) {
         });
 
         if(!Array.isArray(result)) {
-            console.error('Failure in fetchAllUsersTransaction().');
+            log.error('Failure in fetchAllUsersTransaction().');
             return null;
         }
-        console.info('Successfully executed fetchAllUsersTransaction() : ', result && result.length);
+        log.info('Successfully executed fetchAllUsersTransaction() : ', result && result.length);
         return result && result.map(e => e.toJSON());
     } catch (error) {
-        console.error('Failure in fetchAllUsersTransaction() : ', error);
+        log.error('Failure in fetchAllUsersTransaction() : ', error);
         return null;
     }
 }
@@ -33,14 +34,14 @@ async function fetchUserSessionTransaction({ email, password }) {
         isActive: true,
     });
     if (!result) {
-        console.error('Failure in fetchUserSessionTransaction().');
+        log.error('Failure in fetchUserSessionTransaction().');
         return null;
     } 
     
     randomSessionId = uuid.v4() + moment.now();
     setNodeCache(randomSessionId, result._id);
 
-    console.info('Successfully executed fetchUserSessionTransaction()');
+    log.info('Successfully executed fetchUserSessionTransaction()');
     return randomSessionId;
 }
 
@@ -57,13 +58,13 @@ async function fetchUserProfileTransaction(user) {
         });
 
         if(!result) {
-            console.error('Failure in fetchUserProfileTransaction().');
+            log.error('Failure in fetchUserProfileTransaction().');
             return null;
         }
-        console.info('Successfully executed fetchUserProfileTransaction() : ', !!result);
+        log.info('Successfully executed fetchUserProfileTransaction() : ', !!result);
         return result.toJSON();
     } catch (error) {
-        console.error('Failure in fetchUserProfileTransaction() : ', error);
+        log.error('Failure in fetchUserProfileTransaction() : ', error);
         return null;
     }
 }
@@ -73,10 +74,10 @@ async function updateUserProfileTransaction(userData) {
         var result = await User.findOne({ _id: userData._id, isActive: true });
     
         if (!result) {
-            console.error('Failure in fetching user in updateUserProfileTransaction().');
+            log.error('Failure in fetching user in updateUserProfileTransaction().');
             return null;
         }
-        console.info('Successfully find user in updateUserProfileTransaction() : ', !!result);
+        log.info('Successfully find user in updateUserProfileTransaction() : ', !!result);
     
         result.userName = userData.userName || result.userName;
         result.userEmail = userData.userEmail || result.userEmail;
@@ -85,15 +86,15 @@ async function updateUserProfileTransaction(userData) {
         
         result = await result.save();
         if (!result) {
-            console.error('Failure in updating user in updateUserProfileTransaction().');
+            log.error('Failure in updating user in updateUserProfileTransaction().');
             return null;
         }
-        console.info('Successfully updated user in updateUserProfileTransaction() : ', !!result);
+        log.info('Successfully updated user in updateUserProfileTransaction() : ', !!result);
         result = result.toJSON();
         const { userPassword, ...rest } = result;
         return rest;
     } catch (error) {
-        console.error('Failure in updateUserProfileTransaction() : ', error);
+        log.error('Failure in updateUserProfileTransaction() : ', error);
         return null;
     }
 }
@@ -103,14 +104,14 @@ async function saveUserProfileTransaction(userData) {
         var result = await User.create(userData);
     
         if (!result) {
-            console.error('Failure  in saveUserProfileTransaction().');
+            log.error('Failure  in saveUserProfileTransaction().');
             return null;
         }
-        console.info('Successfully created in saveUserProfileTransaction() : ', !!result);
+        log.info('Successfully created in saveUserProfileTransaction() : ', !!result);
     
         return result.toJSON();
     } catch (error) {
-        console.error('Failure in saveUserProfileTransaction() : ', error);
+        log.error('Failure in saveUserProfileTransaction() : ', error);
         return null;
     }
 }
@@ -124,14 +125,14 @@ async function toggleUserActiveTransaction(userData) {
         });
     
         if (!result) {
-            console.error('Failure  in toggleUserActiveTransaction().');
+            log.error('Failure  in toggleUserActiveTransaction().');
             return null;
         }
-        console.info('Successfully updated in toggleUserActiveTransaction() : ', !!result);
+        log.info('Successfully updated in toggleUserActiveTransaction() : ', !!result);
     
         return result && result.ok;
     } catch (error) {
-        console.error('Failure in toggleUserActiveTransaction() : ', error);
+        log.error('Failure in toggleUserActiveTransaction() : ', error);
         return null;
     }
 }
@@ -145,15 +146,32 @@ async function createUserSessionTransaction(userId) {
     });
 
     if (!result) {
-        console.error('Failure in createUserSessionTransaction().');
+        log.error('Failure in createUserSessionTransaction().');
         return null;
     } 
     
     randomSessionId = uuid.v4() + moment.now();
     setNodeCache(randomSessionId, result._id, 300);
 
-    console.info('Successfully executed createUserSessionTransaction()');
+    log.info('Successfully executed createUserSessionTransaction()');
     return randomSessionId;
+}
+
+async function removeUsers() {
+    try {
+        var result = await User.deleteMany({});
+    
+        if (!result) {
+            log.error('Failure  in removeUsers().');
+            return null;
+        }
+        log.info('Successfully created in removeUsers() : ', !!result);
+    
+        return result;
+    } catch (error) {
+        log.error('Failure in removeUsers() : ', error);
+        return null;
+    }
 }
 
 module.exports = {
@@ -163,5 +181,6 @@ module.exports = {
     updateUserProfileTransaction,
     saveUserProfileTransaction,
     toggleUserActiveTransaction,
-    createUserSessionTransaction
+    createUserSessionTransaction,
+    removeUsers
 };

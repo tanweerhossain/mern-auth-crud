@@ -4,19 +4,14 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
-const mongoose = require('mongoose');
 
 const indexRouter = require('./src/controllers/index');
 const nconf = require('./src/conf');
+const { connect: setupDB } = require('./utils/db-setup');
 
 const app = express();
 
-mongoose.connect(nconf.get('DB_URL'), {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
+setupDB(nconf.get('DB-URL'));
 
 app.use(logger('dev'));
 app.use(express.json());

@@ -4,7 +4,9 @@
   "private": true,
   "main": "./bin/www",
   "scripts": {
-    "start": "node node_modules/nodemon/bin/nodemon.js"
+    "start": "node node_modules/nodemon/bin/nodemon.js",
+    "start:prod": "NODE_ENV=prod node .",
+    "test": "mocha --require test/index.test.js --recursive --timeout 40000 --exit"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -13,6 +15,7 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "mocha": "^9.0.3",
     "moment": "^2.24.0",
     "mongoose": "^5.9.10",
     "morgan": "~1.9.1",

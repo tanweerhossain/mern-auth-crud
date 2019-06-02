@@ -3,7 +3,7 @@ const { fetchAllUsersTransaction, toggleUserActiveTransaction, createUserSession
 const { fetchAdminSessionTransaction } = require('../transactions/admin.transactions');
 const nconf = require('../conf');
 const { takeNodeCache } = require('../middlewares/cachingModule');
-const log = require('../../utils/logging');
+const { log } = require('../../utils/logging');
 
 async function fetchAllUsers(req, res, next) {
 

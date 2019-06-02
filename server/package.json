@@ -6,9 +6,12 @@
   "scripts": {
     "start": "node node_modules/nodemon/bin/nodemon.js",
     "start:prod": "NODE_ENV=prod node .",
-    "test": "mocha --require test/index.test.js --recursive --timeout 40000 --exit"
+    "test:windows": "set NODE_ENV=test && mocha --recursive --require test/index.test.js --timeout 40000 --exit",
+    "test": "NODE_ENV=test mocha --recursive --require test/index.test.js --timeout 40000 --exit"
   },
   "dependencies": {
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",

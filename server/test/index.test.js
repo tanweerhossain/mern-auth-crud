@@ -1,6 +1,7 @@
+const chai = require('chai');
+const chaiHttp = require('chai-http');
 
-
-const log = require('../utils/logging');
+const { log } = require('../utils/logging');
 const { connect: setupDB } = require('../utils/db-setup');
 const get = require('./config.json');
 const { saveUserProfileTransaction, removeUsers } = require('../src/transactions/user.transactions');
@@ -11,21 +12,34 @@ const { sampleUserData } = require('../utils/constants');
 exports.mochaHooks = {
     beforeAll: [
         done => {
-            log.info(`NodeJs connecting to ${get['DB-URL']}...`);
+            log.test(`NodeJs connecting to ${get['DB-URL']}...`);
             
-            setupDB(get['DB-URL'])
-                .then(_ => done())
-                .catch(_ => process.exit(1));
+            if ((process.env.NODE_ENV || '').trim() === 'test') {
+                setupDB(get['DB-URL'])
+                    .then(_ => done())
+                    .catch(_ => process.exit(1));
+            } else {
+                process.exit(1);
+            }
+        },
+        done => {
+            /** Integration Testing Setup
+             *  Chai HTTP provides an interface for live integration testing via superagent
+             */
+            chai.use(chaiHttp);
+            done();
         },
         async () => {
-            log.info('Creating User...');
+            log.test('Creating User...');
 
             const result = await saveUserProfileTransaction(sampleUserData);
 
             if (result === null) {
-                log.error('Creating User Failed');
+                log.test('Creating User Failed');
                 process.exit(1);
             }
+            
+            log.test('Created User Successfully');
 
             Promise.resolve(1);
         }

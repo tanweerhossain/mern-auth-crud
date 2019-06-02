@@ -2,7 +2,7 @@ const uuid = require('uuid');
 const moment = require('moment');
 const nconf = require('../conf');
 const { setNodeCache } = require('../middlewares/cachingModule');
-const log = require('../../utils/logging');
+const { log } = require('../../utils/logging');
 
 async function fetchAdminSessionTransaction({ email, password }) {
     const ADMIN_SESSION_ID = nconf.get('ADMIN_SESSION_ID');

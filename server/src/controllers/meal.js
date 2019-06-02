@@ -10,7 +10,7 @@ const {
     deleteMealTransaction,
     fetchMealTransaction
 } = require('../transactions/meal.transactions');
-const log = require('../../utils/logging');
+const { log } = require('../../utils/logging');
 
 async function addMeal(req, res, next) {
     const userId = req.metaData._id;

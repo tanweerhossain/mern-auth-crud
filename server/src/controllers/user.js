@@ -1,7 +1,7 @@
 const { validateFetchUserSession, validateUpdateUserProfile, validateSaveUserProfile } = require('../validations/user');
 const { fetchUserSessionTransaction, fetchUserProfileTransaction, updateUserProfileTransaction, saveUserProfileTransaction } = require('../transactions/user.transactions');
 const { takeNodeCache } = require('../middlewares/cachingModule');
-const log = require('../../utils/logging');
+const { log } = require('../../utils/logging');
 
 async function fetchUserSession(req, res, next) {
   const credentials = {

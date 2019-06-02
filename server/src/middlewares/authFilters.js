@@ -1,6 +1,6 @@
 const { getNodeCache } = require('./cachingModule');
 const nconf = require('../conf');
-const log = require('../../utils/logging');
+const { log } = require('../../utils/logging');
 
 async function adminFilter(req, res, next) {
     const sessionId = req.headers.sessionid;

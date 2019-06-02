@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const log = require('./logging');
+const { log } = require('./logging');
 
 exports.connect = url =>
     mongoose.connect(url, {

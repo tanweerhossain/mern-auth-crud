@@ -1,6 +1,6 @@
 const { getNodeCache } = require('../middlewares/cachingModule');
 const nconf = require('../conf');
-const log = require('../../utils/logging');
+const { log } = require('../../utils/logging');
 
 async function verifySession(req, res, next) {
   const sessionId = req.query.sessionId;

@@ -1,5 +1,5 @@
 const Meal = require('../models/meal.model');
-const log = require('../../utils/logging');
+const { log } = require('../../utils/logging');
 
 async function saveMealTransaction(data, userId) {
     try {

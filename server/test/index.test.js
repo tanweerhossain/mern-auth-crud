@@ -5,7 +5,7 @@ const { log } = require('../utils/logging');
 const { connect: setupDB } = require('../utils/db-setup');
 const get = require('./config.json');
 const { saveUserProfileTransaction, removeUsers } = require('../src/transactions/user.transactions');
-const { sampleUserData } = require('../utils/constants');
+const { sampleUserData1, sampleUserData2 } = require('../utils/constants');
 
 
 
@@ -16,7 +16,10 @@ exports.mochaHooks = {
             
             if ((process.env.NODE_ENV || '').trim() === 'test') {
                 setupDB(get['DB-URL'])
-                    .then(_ => done())
+                    .then(_ => {
+                        log.test(`NodeJs connected to ${get['DB-URL']}`);
+                        done();
+                    })
                     .catch(_ => process.exit(1));
             } else {
                 process.exit(1);
@@ -30,21 +33,24 @@ exports.mochaHooks = {
             done();
         },
         async () => {
-            log.test('Creating User...');
+            log.test('Creating Users...');
 
-            const result = await saveUserProfileTransaction(sampleUserData);
+            const result1 = await saveUserProfileTransaction(sampleUserData1);
+            const result2 = await saveUserProfileTransaction(sampleUserData2);
 
-            if (result === null) {
-                log.test('Creating User Failed');
+            if ((result1 === null) ||
+                (result2 === null)) {
+                log.test('Creating Users Failed');
                 process.exit(1);
             }
             
-            log.test('Created User Successfully');
+            log.test('Created Users Successfully');
 
             Promise.resolve(1);
         }
     ],
     async afterAll() {
         await removeUsers();
+        log.test('Users Removed Successfully');
     }
 }

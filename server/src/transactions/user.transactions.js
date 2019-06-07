@@ -174,6 +174,29 @@ async function removeUsers() {
     }
 }
 
+async function fetchUserByEmailTransaction(userEmail) {
+    try {
+        const result = await User.findOne({
+            userEmail,
+        }, {
+            userName: 1,
+            userEmail: 1,
+            isActive: 1,
+            expectedPerDayIntakeCalorie: 1
+        });
+
+        if(!result) {
+            log.error('Failure in fetchUserByEmailTransaction().');
+            return null;
+        }
+        log.info('Successfully executed fetchUserByEmailTransaction() : ', !!result);
+        return result.toJSON();
+    } catch (error) {
+        log.error('Failure in fetchUserByEmailTransaction() : ', error);
+        return null;
+    }
+}
+
 module.exports = {
     fetchAllUsersTransaction,
     fetchUserSessionTransaction,
@@ -182,5 +205,6 @@ module.exports = {
     saveUserProfileTransaction,
     toggleUserActiveTransaction,
     createUserSessionTransaction,
-    removeUsers
+    removeUsers,
+    fetchUserByEmailTransaction,
 };

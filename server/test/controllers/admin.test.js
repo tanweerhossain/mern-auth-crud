@@ -1,14 +1,13 @@
-const { strict: assert } = require('assert');
-const { after, suite: testSuite, test } = require('mocha');
+const { suite: testSuite, test } = require('mocha');
 const chai = require('chai');
 const uuid = require('uuid');
 
 const server = require('../../bin/www');
 const { CreateSession } = require('../utils/CreateSession');
 const get = require('../config.json');
-const { log } = require('../../utils/logging');
 const { fetchUserByEmailTransaction } = require('../../src/transactions/user.transactions');
-const { sampleUserData2 } = require('../../utils/constants');
+const { sampleUserData2, sampleUserData1 } = require('../../utils/constants');
+const { isValidObjectId } = require('mongoose');
 
 testSuite('API: GET /ajax/admin/fetch/users [ fetchAllUsers ]', function () {
     const endpoint = '/ajax/admin/fetch/users';
@@ -83,6 +82,7 @@ testSuite('API: GET /ajax/admin/fetch/users [ fetchAllUsers ]', function () {
                     chai.expect(isActive).to.be.a('boolean');
                     chai.expect(_id).to.be.a('string');
                     chai.expect(_id).to.have.length.greaterThan(0);
+                    chai.expect(isValidObjectId(_id)).to.be.true;
                     chai.expect(userName).to.be.a('string');
                     chai.expect(userName).to.have.length.greaterThan(0);
                     chai.expect(userEmail).to.be.a('string');
@@ -368,6 +368,179 @@ testSuite('API: PUT /ajax/admin/toggle/user/active [ toggleUserActive ]', functi
                 chai.expect(isActive).to.be.a('boolean');
                 chai.expect(_id).to.be.a('string');
                 chai.expect(_id).to.have.length.greaterThan(0);
+                chai.expect(isValidObjectId(_id)).to.be.true;
+
+                done();
+            });
+    });
+});
+
+testSuite('API: POST /ajax/admin/user/login [ createUserSession ]', function() {
+    const endpoint = '/ajax/admin/user/login';
+    let adminSessionId = undefined;
+    let sampleUserId = undefined;
+
+    before(async () => {
+        adminSessionId = await CreateSession.create('ADMIN', get.ADMIN_EMAIL, get.ADMIN_PASSWORD);
+        ({ _id: sampleUserId } = await fetchUserByEmailTransaction(sampleUserData1.userEmail));
+    });
+    test('should return 401 response while missing sessionid', function (done) {
+        chai.request(server)
+            .post(endpoint)
+            .end((err, res) => {
+                chai.expect(res.ok).to.be.false;
+                chai.expect(res.status).to.equal(401);
+                chai.expect(res.body).to.be.a('object');
+
+                const { success, message } = res.body;
+          
+                chai.expect(success).to.be.a('boolean');
+                chai.expect(success).to.be.false;
+                chai.expect(message).to.be.a('string');
+                chai.expect(message).to.equal('Unauthorized Access');
+
+                done();
+            });
+    });
+    test('should return 401 response while incorrect sessionid', function (done) {
+        chai.request(server)
+            .post(endpoint)
+            .set('sessionid', uuid.v1())
+            .end((err, res) => {
+                chai.expect(res.ok).to.be.false;
+                chai.expect(res.status).to.equal(401);
+                chai.expect(res.body).to.be.a('object');
+
+                const { success, message } = res.body;
+          
+                chai.expect(success).to.be.a('boolean');
+                chai.expect(success).to.be.false;
+                chai.expect(message).to.be.a('string');
+                chai.expect(message).to.equal('Unauthorized Access');
+
+                done();
+            });
+    });
+    test('should return 400 response while passing no body and proper sessionid', function (done) {
+        chai.request(server)
+            .post(endpoint)
+            .set('sessionid', adminSessionId)
+            .end((err, res) => {
+                chai.expect(res.ok).to.be.false;
+                chai.expect(res.status).to.equal(400);
+                chai.expect(res.body).to.be.a('object');
+
+                const { success, message } = res.body;
+          
+                chai.expect(success).to.be.a('boolean');
+                chai.expect(success).to.be.false;
+                chai.expect(message).to.be.a('string');
+                chai.expect(message).to.have.length.greaterThan(0);
+
+                done();
+            });
+    });
+    test('should return 400 response while passing incorrect user id and proper sessionid', function (done) {
+        chai.request(server)
+            .post(endpoint)
+            .set('sessionid', adminSessionId)
+            .send({ _id: uuid.v1() })
+            .end((err, res) => {
+                chai.expect(res.ok).to.be.false;
+                chai.expect(res.status).to.equal(400);
+                chai.expect(res.body).to.be.a('object');
+
+                const { success, message } = res.body;
+          
+                chai.expect(success).to.be.a('boolean');
+                chai.expect(success).to.be.false;
+                chai.expect(message).to.be.a('string');
+                chai.expect(message).to.have.length.greaterThan(0);
+
+                done();
+            });
+    });
+    test('should return 200 response on correct sessionid and data', function (done) {
+        chai.request(server)
+            .post(endpoint)
+            .set('sessionid', adminSessionId)
+            .send({
+                _id: sampleUserId,
+            })
+            .end((err, res) => {
+                chai.expect(res.ok).to.be.true;
+                chai.expect(res.status).to.equal(200);
+                chai.expect(res.body).to.be.a('object');
+
+                const { success, body } = res.body;
+          
+                chai.expect(success).to.be.a('boolean');
+                chai.expect(success).to.be.true;
+                chai.expect(body).to.be.a('string');
+                chai.expect(body).to.have.length.greaterThan(0);
+
+                done();
+            });
+    });
+});
+
+testSuite('API: GET /ajax/admin/logout [ adminLogout ]', function() {
+    const endpoint = '/ajax/admin/logout';
+    let adminSessionId = undefined;
+
+    before(async () => {
+        adminSessionId = await CreateSession.create('ADMIN', get.ADMIN_EMAIL, get.ADMIN_PASSWORD);
+    });
+    test('should return 401 response while missing sessionid', function (done) {
+        chai.request(server)
+            .get(endpoint)
+            .end((err, res) => {
+                chai.expect(res.ok).to.be.false;
+                chai.expect(res.status).to.equal(401);
+                chai.expect(res.body).to.be.a('object');
+
+                const { success, message } = res.body;
+          
+                chai.expect(success).to.be.a('boolean');
+                chai.expect(success).to.be.false;
+                chai.expect(message).to.be.a('string');
+                chai.expect(message).to.equal('Unauthorized Access');
+
+                done();
+            });
+    });
+    test('should return 401 response while incorrect sessionid', function (done) {
+        chai.request(server)
+            .get(endpoint)
+            .set('sessionid', uuid.v1())
+            .end((err, res) => {
+                chai.expect(res.ok).to.be.false;
+                chai.expect(res.status).to.equal(401);
+                chai.expect(res.body).to.be.a('object');
+
+                const { success, message } = res.body;
+          
+                chai.expect(success).to.be.a('boolean');
+                chai.expect(success).to.be.false;
+                chai.expect(message).to.be.a('string');
+                chai.expect(message).to.equal('Unauthorized Access');
+
+                done();
+            });
+    });
+    test('should return 200 response on correct sessionid', function (done) {
+        chai.request(server)
+            .get(endpoint)
+            .set('sessionid', adminSessionId)
+            .end((err, res) => {
+                chai.expect(res.ok).to.be.true;
+                chai.expect(res.status).to.equal(200);
+                chai.expect(res.body).to.be.a('object');
+
+                const { success } = res.body;
+          
+                chai.expect(success).to.be.a('boolean');
+                chai.expect(success).to.be.true;
 
                 done();
             });

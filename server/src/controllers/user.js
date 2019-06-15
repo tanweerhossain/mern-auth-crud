@@ -52,7 +52,7 @@ async function fetchUserProfile(req, res, next) {
         success: true,
         body: savedResult,
     });
-  }
+}
 
 async function updateUserProfile(req, res, next) {
     const userData = {

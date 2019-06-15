@@ -2,9 +2,9 @@
     "DB-URL": "mongodb://localhost:27017/calorie-tracker-test",
     "ADMIN_EMAIL": "admin@domain.in",
     "ADMIN_PASSWORD": "987654321@qQ",
-
-
-    "FRONT_END_IP": "http://localhost:3000",
     "ADMIN_SESSION_ID": "ADMIN-SESSION-ID",
-    "USER_SESSION_ID": "USER-SESSION-ID"
+    "USER_SESSION_ID": "USER-SESSION-ID",
+
+
+    "FRONT_END_IP": "http://localhost:3000"
 }

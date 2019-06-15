@@ -13,3 +13,11 @@ exports.sampleUserData2 = {
     expectedPerDayIntakeCalorie: 1300.0,
     isActive: false
 };
+
+exports.sampleUserData3 = {
+    userName: 'User3',
+    userEmail: 'email3@domain.in',
+    userPassword: 'Abc@1234',
+    expectedPerDayIntakeCalorie: 1600.0,
+    isActive: false
+};

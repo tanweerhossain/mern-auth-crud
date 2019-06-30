@@ -21,3 +21,17 @@ exports.sampleUserData3 = {
     expectedPerDayIntakeCalorie: 1600.0,
     isActive: false
 };
+
+exports.sampleUserData4 = {
+    userName: 'User4',
+    userEmail: 'email4@domain.in',
+    userPassword: 'Abc@1234',
+    expectedPerDayIntakeCalorie: 1600.0,
+    isActive: false
+};
+
+exports.sampleMeal1 = {
+    mealName: 'Meal1',
+    mealDate: '2019/01/01',
+    mealCalories: 50
+};

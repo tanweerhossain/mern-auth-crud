@@ -35,21 +35,21 @@ function validateUpdateUserProfile(data) {
 
     if(!data._id) errorJSON.message.push('User Id is required.');
     if(!mongoose.Types.ObjectId.isValid(data._id)) errorJSON.message.push('User Id is invalid.');
-    if(data.email &&
+    if(data.userEmail &&
             !(
-            (typeof data.email === 'string') &&
-            validator.isEmail(data.email)
+            (typeof data.userEmail === 'string') &&
+            validator.isEmail(data.userEmail)
         )) errorJSON.message.push('Email is invalid.');
-    if(data.name &&
+    if(data.userName &&
             !(
-            (typeof data.name === 'string') &&
-            (data.name.length !== 0)
+            (typeof data.userName === 'string') &&
+            (data.userName.length !== 0)
         )) errorJSON.message.push('Name is invalid.');
-    if (data.password &&
+    if (data.userPassword &&
         !(
-            (typeof data.password === 'string') &&
-            (data.password.length >= 8) &&
-            data.password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/)
+            (typeof data.userPassword === 'string') &&
+            (data.userPassword.length >= 8) &&
+            data.userPassword.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/)
         )) errorJSON.message.push('Password is invalid.');
     if (data.expectedPerDayIntakeCalorie &&
         !(

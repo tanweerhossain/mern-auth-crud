@@ -1,13 +1,13 @@
 const { suite: testSuite, test } = require('mocha');
 const chai = require('chai');
 const uuid = require('uuid');
+const { isValidObjectId } = require('mongoose');
 
 const server = require('../../bin/www');
 const { CreateSession } = require('../utils/CreateSession');
 const get = require('../config.json');
 const { fetchUserByEmailTransaction } = require('../../src/transactions/user.transactions');
 const { sampleUserData2, sampleUserData1 } = require('../../utils/constants');
-const { isValidObjectId } = require('mongoose');
 
 testSuite('API: GET /ajax/admin/fetch/users [ fetchAllUsers ]', function () {
     const endpoint = '/ajax/admin/fetch/users';

@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node node_modules/nodemon/bin/nodemon.js",
     "start:prod": "NODE_ENV=prod node .",
-    "test:windows": "set NODE_ENV=test && mocha --recursive --require test/index.test.js --timeout 40000 --exit",
-    "test": "NODE_ENV=test mocha --recursive --require test/index.test.js --timeout 40000 --exit"
+    "test:windows": "set NODE_ENV=test && mocha --recursive --require test/index.test.js --reporter spec --timeout 40000 --exit",
+    "test": "NODE_ENV=test mocha --recursive --require test/index.test.js --reporter spec --timeout 40000 --exit"
   },
   "dependencies": {
     "chai": "^4.3.4",

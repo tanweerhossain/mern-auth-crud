@@ -6,6 +6,7 @@ const { connect: setupDB } = require('../utils/db-setup');
 const get = require('./config.json');
 const { saveUserProfileTransaction, removeUsers } = require('../src/transactions/user.transactions');
 const { sampleUserData1, sampleUserData2 } = require('../utils/constants');
+const { removeMeals } = require('../src/transactions/meal.transactions');
 
 
 
@@ -52,5 +53,8 @@ exports.mochaHooks = {
     async afterAll() {
         await removeUsers();
         log.test('Users Removed Successfully');
+
+        await removeMeals();
+        log.test('Meals Removed Successfully');
     }
 }

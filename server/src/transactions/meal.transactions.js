@@ -54,7 +54,7 @@ async function deleteMealTransaction(data, userId) {
             user: userId
         });
 
-        if(!result) {
+        if(!(result && result.deletedCount)) {
             log.error('Failure in deleteMealTransaction().');
             return null;
         }
@@ -88,9 +88,27 @@ async function fetchMealTransaction(dateRange, userId) {
     }
 }
 
+async function removeMeals() {
+    try {
+        var result = await Meal.deleteMany({});
+    
+        if (!result) {
+            log.error('Failure  in removeMeals().');
+            return null;
+        }
+        log.info('Successfully created in removeMeals() : ', !!result);
+    
+        return result;
+    } catch (error) {
+        log.error('Failure in removeMeals() : ', error);
+        return null;
+    }
+}
+
 module.exports = {
     saveMealTransaction,
     updateMealTransaction,
     deleteMealTransaction,
     fetchMealTransaction,
+    removeMeals
 };

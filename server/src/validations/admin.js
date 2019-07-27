@@ -7,19 +7,21 @@ function validateFetchAdminSession(data) {
         message: [],
     };
 
-    if(!data.email) errorJSON.message.push('Email is required.');
-    if(!data.password) errorJSON.message.push('Password is required.');
-    if(!(
+    if (typeof data !== 'object' || !data) data = {};
+
+    if (!data.email) errorJSON.message.push('Email is required.');
+    if (!data.password) errorJSON.message.push('Password is required.');
+    if (!(
         (typeof data.email === 'string') &&
         validator.isEmail(data.email)
     )) errorJSON.message.push('Email is invalid.');
-    if(!(
+    if (!(
         (typeof data.password === 'string') &&
         (data.password.length >= 8) &&
         data.password.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/)
     )) errorJSON.message.push('Password is invalid.');
-    
-    if(errorJSON.message.length) {
+
+    if (errorJSON.message.length) {
         errorJSON.status = true;
         errorJSON.message = errorJSON.message.join('\n');
     }

@@ -3,18 +3,19 @@ const { strict: assert } = require('assert');
 const uuid = require('uuid');
 const mongoose = require('mongoose');
 
-const get = require('../config.json');
-const { validateFetchAdminSession, validateToggleUserActive, validateCreateUserSession } = require('../../src/validations/admin');
+const { validateFetchUserSession, validateUpdateUserProfile, validateSaveUserProfile } = require('../../src/validations/user');
+const { sampleUserData1 } = require('../../utils/constants');
+const { log } = require('../../utils/logging');
 
 
-testSuite('VALIDATION: validateFetchAdminSession(data: object): object', function () {
+testSuite('VALIDATION: validateFetchUserSession(data: object): object', function () {
     const data = {
-        email: get.ADMIN_EMAIL,
-        password: get.ADMIN_PASSWORD
+        email: sampleUserData1.userEmail,
+        password: sampleUserData1.userPassword
     };
     
     test('should return errorMessage if data is missing', function (done) {
-        const result = validateFetchAdminSession();
+        const result = validateFetchUserSession();
         
         assert.strictEqual(typeof result, 'object');
         const { status, message } = result;
@@ -34,7 +35,7 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
         done();
     });
     test('should return errorMessage if data is not proper', function (done) {
-        let result = validateFetchAdminSession(null);
+        let result = validateFetchUserSession(null);
         
         assert.strictEqual(typeof result, 'object');
         let { status, message } = result;
@@ -51,7 +52,7 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
             assert.ok(msg.length > 0);
         }
         
-        result = validateFetchAdminSession('');
+        result = validateFetchUserSession('');
         
         assert.strictEqual(typeof result, 'object');
         ({ status, message } = result);
@@ -71,7 +72,7 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
         done();
     });
     test('should return errorMessage if data is blank object', function (done) {
-        const result = validateFetchAdminSession({});
+        const result = validateFetchUserSession({});
         
         assert.strictEqual(typeof result, 'object');
         const { status, message } = result;
@@ -91,7 +92,7 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
         done();
     });
     test('should return errorMessage if email is missing', function (done) {
-        const result = validateFetchAdminSession({
+        const result = validateFetchUserSession({
             password: data.password,
         });
         
@@ -113,7 +114,7 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
         done();
     });
     test('should return errorMessage if email is incorrect', function (done) {
-        const result = validateFetchAdminSession({
+        const result = validateFetchUserSession({
             email: 'something@anything',
             password: data.password
         });
@@ -136,7 +137,7 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
         done();
     });
     test('should return errorMessage if password is missing', function (done) {
-        const result = validateFetchAdminSession({
+        const result = validateFetchUserSession({
             email: data.email
         });
         
@@ -158,7 +159,7 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
         done();
     });
     test('should return errorMessage if password is incorrect', function (done) {
-        const result = validateFetchAdminSession({
+        const result = validateFetchUserSession({
             email: data.email,
             password: 'anything'
         });
@@ -181,7 +182,7 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
         done();
     });
     test('should not return errorMessage if data is correct', function (done) {
-        const result = validateFetchAdminSession(data);
+        const result = validateFetchUserSession(data);
         
         assert.strictEqual(typeof result, 'object');
         const { status, message } = result;
@@ -196,14 +197,14 @@ testSuite('VALIDATION: validateFetchAdminSession(data: object): object', functio
     });
 });
 
-testSuite('VALIDATION: validateToggleUserActive(data: object): object', function () {
+testSuite('VALIDATION: validateUpdateUserProfile(data: object): object', function () {
     const data = {
         _id: new mongoose.Types.ObjectId(),
-        isActive: true,
+        ...sampleUserData1
     };
     
     test('should return errorMessage if data is missing', function (done) {
-        const result = validateToggleUserActive();
+        const result = validateUpdateUserProfile();
         
         assert.strictEqual(typeof result, 'object');
         const { status, message } = result;
@@ -223,7 +224,7 @@ testSuite('VALIDATION: validateToggleUserActive(data: object): object', function
         done();
     });
     test('should return errorMessage if data is not proper', function (done) {
-        let result = validateToggleUserActive(null);
+        let result = validateUpdateUserProfile(null);
         
         assert.strictEqual(typeof result, 'object');
         let { status, message } = result;
@@ -240,7 +241,7 @@ testSuite('VALIDATION: validateToggleUserActive(data: object): object', function
             assert.ok(msg.length > 0);
         }
         
-        result = validateToggleUserActive('');
+        result = validateUpdateUserProfile('');
         
         assert.strictEqual(typeof result, 'object');
         ({ status, message } = result);
@@ -260,7 +261,7 @@ testSuite('VALIDATION: validateToggleUserActive(data: object): object', function
         done();
     });
     test('should return errorMessage if data is blank object', function (done) {
-        const result = validateToggleUserActive({});
+        const result = validateUpdateUserProfile({});
         
         assert.strictEqual(typeof result, 'object');
         const { status, message } = result;
@@ -280,8 +281,9 @@ testSuite('VALIDATION: validateToggleUserActive(data: object): object', function
         done();
     });
     test('should return errorMessage if _id is missing', function (done) {
-        const result = validateToggleUserActive({
-            isActive: data.isActive,
+        const result = validateUpdateUserProfile({
+            ...data,
+            _id: undefined
         });
         
         assert.strictEqual(typeof result, 'object');
@@ -302,9 +304,9 @@ testSuite('VALIDATION: validateToggleUserActive(data: object): object', function
         done();
     });
     test('should return errorMessage if _id is incorrect', function (done) {
-        const result = validateToggleUserActive({
-            _id: uuid.v1(),
-            isActive: data.isActive
+        const result = validateUpdateUserProfile({
+            ...data,
+            _id: uuid.v1()
         });
         
         assert.strictEqual(typeof result, 'object');
@@ -314,63 +316,15 @@ testSuite('VALIDATION: validateToggleUserActive(data: object): object', function
         assert.strictEqual(typeof status, 'boolean');
         assert.ok(status);
         assert.strictEqual(typeof message, 'string');
-        assert.ok(message.length > 0);
-
-        const listOfMessages = message.split('\n');
-        for (const msg of listOfMessages) {
-            assert.strictEqual(typeof msg, 'string');
-            assert.strictEqual(msg, 'User Id is invalid.');
-        }
+        assert.strictEqual(message, 'User Id is invalid.');
         
         done();
     });
-    test('should return errorMessage if isActive is missing', function (done) {
-        const result = validateToggleUserActive({
-            _id: data._id
+    test('should not return errorMessage if email is missing', function (done) {
+        const result = validateUpdateUserProfile({
+            ...data,
+            userEmail: undefined
         });
-        
-        assert.strictEqual(typeof result, 'object');
-        const { status, message } = result;
-        
-        
-        assert.strictEqual(typeof status, 'boolean');
-        assert.ok(status);
-        assert.strictEqual(typeof message, 'string');
-        assert.ok(message.length > 0);
-
-        const listOfMessages = message.split('\n');
-        for (const msg of listOfMessages) {
-            assert.strictEqual(typeof msg, 'string');
-            assert.ok(msg.length > 0);
-        }
-        
-        done();
-    });
-    test('should return errorMessage if isActive is incorrect', function (done) {
-        const result = validateToggleUserActive({
-            _id: data._id,
-            isActive: null
-        });
-        
-        assert.strictEqual(typeof result, 'object');
-        const { status, message } = result;
-        
-        
-        assert.strictEqual(typeof status, 'boolean');
-        assert.ok(status);
-        assert.strictEqual(typeof message, 'string');
-        assert.ok(message.length > 0);
-
-        const listOfMessages = message.split('\n');
-        for (const msg of listOfMessages) {
-            assert.strictEqual(typeof msg, 'string');
-            assert.strictEqual(msg, 'isActive is invalid.');
-        }
-        
-        done();
-    });
-    test('should not return errorMessage if data is correct', function (done) {
-        const result = validateToggleUserActive(data);
         
         assert.strictEqual(typeof result, 'object');
         const { status, message } = result;
@@ -379,17 +333,154 @@ testSuite('VALIDATION: validateToggleUserActive(data: object): object', function
         assert.strictEqual(typeof status, 'boolean');
         assert.ok(!status);
         assert.ok(Array.isArray(message));
-        assert.ok(message.length === 0);
+        assert.ok(!message.length);
+        
+        done();
+    });
+    test('should return errorMessage if email is incorrect', function (done) {
+        const result = validateUpdateUserProfile({
+            ...data,
+            userEmail: 'something@.anything'
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        
+        const { status, message } = result;
+              
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.strictEqual(message, 'Email is invalid.');
+
+        done();
+    });
+    test('should not return errorMessage if password is missing', function (done) {
+        const result = validateUpdateUserProfile({
+            ...data,
+            userPassword: undefined
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(!status);
+        assert.ok(Array.isArray(message));
+        assert.ok(!message.length);
+        
+        done();
+    });
+    test('should return errorMessage if password is incorrect', function (done) {
+        const result = validateUpdateUserProfile({
+            ...data,
+            userPassword: 'anything'
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.strictEqual(message, 'Password is invalid.');
+        
+        done();
+    });
+    test('should not return errorMessage if userName is missing', function (done) {
+        const result = validateUpdateUserProfile({
+            ...data,
+            userName: undefined
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(!status);
+        assert.ok(Array.isArray(message));
+        assert.ok(!message.length);
+        
+        done();
+    });
+    test('should return errorMessage if userName is incorrect', function (done) {
+        const result = validateUpdateUserProfile({
+            ...data,
+            userName: 11
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.strictEqual(message, 'Name is invalid.');
+        
+        done();
+    });
+    test('should not return errorMessage if expectedPerDayIntakeCalorie is missing', function (done) {
+        const result = validateUpdateUserProfile({
+            ...data,
+            expectedPerDayIntakeCalorie: undefined
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(!status);
+        assert.ok(Array.isArray(message));
+        assert.ok(!message.length);
+        
+        done();
+    });
+    test('should return errorMessage if expectedPerDayIntakeCalorie is incorrect', function (done) {
+        const result = validateUpdateUserProfile({
+            ...data,
+            expectedPerDayIntakeCalorie: 'any'
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.strictEqual(message, 'expectedPerDayIntakeCalorie is invalid.');
+        
+        done();
+    });
+    test('should not return errorMessage if data is correct', function (done) {
+        const result = validateUpdateUserProfile(data);
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(!status);
+        assert.ok(Array.isArray(message));
+        assert.ok(!message.length);
         
         done();
     });
 });
 
-testSuite('VALIDATION: validateCreateUserSession(data: string): object', function () {
-    const data =  new mongoose.Types.ObjectId();
+testSuite('VALIDATION: validateSaveUserProfile(data: object): object', function () {
+    const data = {
+        ...sampleUserData1,
+        expectedPerDayIntakeCalorie: undefined,
+        isActive: undefined
+    };
     
     test('should return errorMessage if data is missing', function (done) {
-        const result = validateCreateUserSession();
+        const result = validateSaveUserProfile();
         
         assert.strictEqual(typeof result, 'object');
         const { status, message } = result;
@@ -409,7 +500,7 @@ testSuite('VALIDATION: validateCreateUserSession(data: string): object', functio
         done();
     });
     test('should return errorMessage if data is not proper', function (done) {
-        let result = validateCreateUserSession(null);
+        let result = validateSaveUserProfile(null);
         
         assert.strictEqual(typeof result, 'object');
         let { status, message } = result;
@@ -426,7 +517,7 @@ testSuite('VALIDATION: validateCreateUserSession(data: string): object', functio
             assert.ok(msg.length > 0);
         }
         
-        result = validateCreateUserSession('');
+        result = validateSaveUserProfile('');
         
         assert.strictEqual(typeof result, 'object');
         ({ status, message } = result);
@@ -445,8 +536,148 @@ testSuite('VALIDATION: validateCreateUserSession(data: string): object', functio
         
         done();
     });
+    test('should return errorMessage if data is blank object', function (done) {
+        const result = validateSaveUserProfile({});
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.ok(message.length > 0);
+
+        const listOfMessages = message.split('\n');
+        for (const msg of listOfMessages) {
+            assert.strictEqual(typeof msg, 'string');
+            assert.ok(msg.length > 0);
+        }
+        
+        done();
+    });
+    test('should return errorMessage if email is missing', function (done) {
+        const result = validateSaveUserProfile({
+            ...data,
+            userEmail: undefined
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.ok(message.length > 0);
+
+        const listOfMessages = message.split('\n');
+        for (const msg of listOfMessages) {
+            assert.strictEqual(typeof msg, 'string');
+            assert.ok(msg.length > 0);
+        }
+        
+        done();
+    });
+    test('should return errorMessage if email is incorrect', function (done) {
+        const result = validateSaveUserProfile({
+            ...data,
+            userEmail: 'something@.anything'
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        
+        const { status, message } = result;
+              
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.strictEqual(message, 'Email is invalid.');
+
+        done();
+    });
+    test('should return errorMessage if password is missing', function (done) {
+        const result = validateSaveUserProfile({
+            ...data,
+            userPassword: undefined
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.ok(message.length > 0);
+
+        const listOfMessages = message.split('\n');
+        for (const msg of listOfMessages) {
+            assert.strictEqual(typeof msg, 'string');
+            assert.ok(msg.length > 0);
+        }
+        
+        done();
+    });
+    test('should return errorMessage if password is incorrect', function (done) {
+        const result = validateSaveUserProfile({
+            ...data,
+            userPassword: 'anything'
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.strictEqual(message, 'Password is invalid.');
+        
+        done();
+    });
+    test('should return errorMessage if userName is missing', function (done) {
+        const result = validateSaveUserProfile({
+            ...data,
+            userName: undefined
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.ok(message.length > 0);
+
+        const listOfMessages = message.split('\n');
+        for (const msg of listOfMessages) {
+            assert.strictEqual(typeof msg, 'string');
+            assert.ok(msg.length > 0);
+        }
+        
+        done();
+    });
+    test('should return errorMessage if userName is incorrect', function (done) {
+        const result = validateSaveUserProfile({
+            ...data,
+            userName: 11
+        });
+        
+        assert.strictEqual(typeof result, 'object');
+        const { status, message } = result;
+        
+        
+        assert.strictEqual(typeof status, 'boolean');
+        assert.ok(status);
+        assert.strictEqual(typeof message, 'string');
+        assert.strictEqual(message, 'Name is invalid.');
+        
+        done();
+    });
     test('should not return errorMessage if data is correct', function (done) {
-        const result = validateCreateUserSession(data);
+        const result = validateSaveUserProfile(data);
         
         assert.strictEqual(typeof result, 'object');
         const { status, message } = result;
@@ -455,7 +686,7 @@ testSuite('VALIDATION: validateCreateUserSession(data: string): object', functio
         assert.strictEqual(typeof status, 'boolean');
         assert.ok(!status);
         assert.ok(Array.isArray(message));
-        assert.ok(message.length === 0);
+        assert.ok(!message.length);
         
         done();
     });

@@ -35,6 +35,8 @@ function validateToggleUserActive(data) {
         message: [],
     };
 
+    if (typeof data !== 'object' || !data) data = {};
+
     if (!data._id) errorJSON.message.push('User Id is required.');
     if (!mongoose.Types.ObjectId.isValid(data._id)) errorJSON.message.push('User Id is invalid.');
     if (data.isActive === undefined) errorJSON.message.push('isActive is required.');

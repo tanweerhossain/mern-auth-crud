@@ -7,18 +7,20 @@ function validateAddMeal(data) {
         message: [],
     };
 
-    if(!data.mealName) errorJSON.message.push('Meal Name is required.');
-    if(typeof data.mealName !== 'string') errorJSON.message.push('Meal Name is invalid.');
-    if(!data.mealCalories) errorJSON.message.push('Meal Calories is required.');
-    if(typeof data.mealCalories !== 'number') errorJSON.message.push('Meal Calories is invalid.');
-    if(!data.mealDate) errorJSON.message.push('Meal Date is required.');
-    if(typeof data.mealDate !== 'string') errorJSON.message.push('Meal Date is invalid.');
-    if(!moment(data.mealDate, 'YYYY/MM/DD', true).isValid()) errorJSON.message.push('Meal Date is invalid.');
-    
-    if(errorJSON.message.length) {
+    if (typeof data !== 'object' || !data) data = {};
+
+    if (!data.mealName) errorJSON.message.push('Meal Name is required.');
+    if (typeof data.mealName !== 'string') errorJSON.message.push('Meal Name is invalid.');
+    if (!data.mealCalories) errorJSON.message.push('Meal Calories is required.');
+    if (typeof data.mealCalories !== 'number') errorJSON.message.push('Meal Calories is invalid.');
+    if (!data.mealDate) errorJSON.message.push('Meal Date is required.');
+    if (typeof data.mealDate !== 'string') errorJSON.message.push('Meal Date is invalid.');
+    if (!moment(data.mealDate, 'YYYY/MM/DD', true).isValid()) errorJSON.message.push('Meal Date is invalid.');
+
+    if (errorJSON.message.length) {
         errorJSON.status = true;
         errorJSON.message = errorJSON.message.join('\n');
-    } else 
+    } else
         errorJSON.message = errorJSON.message.join('\n');
 
     return errorJSON;
@@ -27,6 +29,8 @@ function validateAddMeal(data) {
 function validateUpdateMeal(data) {
     const errorJSON = validateAddMeal(data);
     errorJSON.message = [errorJSON.message];
+
+    if (typeof data !== 'object' || !data) data = {};
 
     if(!data._id) errorJSON.message.push('Meal Id is required.');
     if(!mongoose.Types.ObjectId.isValid(data._id)) errorJSON.message.push('Meal Id is invalid.');
@@ -48,10 +52,10 @@ function validateDeleteMeal(data) {
         message: [],
     };
 
-    if(!data) errorJSON.message.push('Meal Id is required.');
-    if(!mongoose.Types.ObjectId.isValid(data)) errorJSON.message.push('Meal Id is invalid.');
-    
-    if(errorJSON.message.length) {
+    if (!data) errorJSON.message.push('Meal Id is required.');
+    if (!mongoose.Types.ObjectId.isValid(data)) errorJSON.message.push('Meal Id is invalid.');
+
+    if (errorJSON.message.length) {
         errorJSON.status = true;
         errorJSON.message = errorJSON.message.join('\n');
     }
@@ -65,19 +69,25 @@ function validateFetchMeal(data) {
         message: [],
     };
 
-    if(!data) errorJSON.message.push('Meal Date Range is required.');
-    if(typeof data !== 'object') errorJSON.message.push('Meal Date Range is invalid.');
-    else {
-        if(!data.min) errorJSON.message.push('Meal Date Min Range is required.');
-        if(typeof data.min !== 'string') errorJSON.message.push('Meal Date Min Range is invalid.');
-        if(!moment(data.min, 'YYYY/MM/DD', true).isValid()) errorJSON.message.push('Meal Date Min Range is invalid.');
+    if (typeof data !== 'object' || !data) data = {};
 
-        if(!data.max) errorJSON.message.push('Meal Date Max Range is required.');
-        if(typeof data.max !== 'string') errorJSON.message.push('Meal Date Max Range is invalid.');
-        if(!moment(data.max, 'YYYY/MM/DD', true).isValid()) errorJSON.message.push('Meal Date Max Range is invalid.');
+    if (!data.min) errorJSON.message.push('Meal Date Min Range is required.');
+    if (typeof data.min !== 'string') errorJSON.message.push('Meal Date Min Range is invalid.');
+    if (!moment(data.min, 'YYYY/MM/DD', true).isValid()) errorJSON.message.push('Meal Date Min Range is invalid.');
+
+    if (!data.max) errorJSON.message.push('Meal Date Max Range is required.');
+    if (typeof data.max !== 'string') errorJSON.message.push('Meal Date Max Range is invalid.');
+    if (!moment(data.max, 'YYYY/MM/DD', true).isValid()) errorJSON.message.push('Meal Date Max Range is invalid.');
+
+    if (moment(data.min, 'YYYY/MM/DD', true).isValid() &&
+        moment(data.max, 'YYYY/MM/DD', true).isValid()) {
+        if (moment(data.min, 'YYYY/MM/DD', true).unix() >
+            moment(data.max, 'YYYY/MM/DD', true).unix()) {
+            errorJSON.message.push('Meal Date Range is invalid.');
+        }
     }
-    
-    if(errorJSON.message.length) {
+
+    if (errorJSON.message.length) {
         errorJSON.status = true;
         errorJSON.message = errorJSON.message.join('\n');
     }

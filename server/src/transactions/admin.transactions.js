@@ -4,7 +4,7 @@ const nconf = require('../conf');
 const { setNodeCache } = require('../middlewares/cachingModule');
 const { log } = require('../../utils/logging');
 
-async function fetchAdminSessionTransaction({ email, password }) {
+function fetchAdminSessionTransaction({ email, password }) {
     const ADMIN_SESSION_ID = nconf.get('ADMIN_SESSION_ID');
     var randomSessionId = '';
 

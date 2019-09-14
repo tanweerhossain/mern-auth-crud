@@ -27,7 +27,7 @@ async function updateMealTransaction(data, userId) {
         const result = await Meal.findOneAndUpdate({
             _id: data._id,
             user: userId
-        },{
+        }, {
             mealName: data.mealName,
             mealCalories: data.mealCalories,
             mealDate: data.mealDate,
@@ -35,7 +35,7 @@ async function updateMealTransaction(data, userId) {
             new: true
         });
 
-        if(!result) {
+        if (!result) {
             log.error('Failure in updateMealTransaction().');
             return null;
         }

@@ -4,7 +4,7 @@ const User = require('../models/user.model');
 const { setNodeCache } = require('../middlewares/cachingModule');
 const { log } = require('../../utils/logging');
 
-async function fetchAllUsersTransaction(dateRange, user = null) {
+async function fetchAllUsersTransaction() {
     try {
         const result = await User.find({}, {
             userName: 1,

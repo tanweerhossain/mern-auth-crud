@@ -174,6 +174,40 @@ async function removeUsers() {
     }
 }
 
+async function removeUserByEmailId(userEmail) {
+    try {
+        var result = await User.deleteOne({ userEmail });
+    
+        if (!result) {
+            log.error('Failure  in removeUserByEmailId().');
+            return null;
+        }
+        log.info('Successfully removed in removeUserByEmailId() : ', !!result);
+    
+        return result;
+    } catch (error) {
+        log.error('Failure in removeUserByEmailId() : ', error);
+        return null;
+    }
+}
+
+async function removeUserById(userId) {
+    try {
+        var result = await User.deleteOne({ _id: userId });
+    
+        if (!result) {
+            log.error('Failure  in removeUserById().');
+            return null;
+        }
+        log.info('Successfully removed in removeUserById() : ', !!result);
+    
+        return result;
+    } catch (error) {
+        log.error('Failure in removeUserById() : ', error);
+        return null;
+    }
+}
+
 async function fetchUserByEmailTransaction(userEmail) {
     try {
         const result = await User.findOne({
@@ -182,7 +216,8 @@ async function fetchUserByEmailTransaction(userEmail) {
             userName: 1,
             userEmail: 1,
             isActive: 1,
-            expectedPerDayIntakeCalorie: 1
+            expectedPerDayIntakeCalorie: 1,
+            userPassword: 1
         });
 
         if(!result) {
@@ -206,5 +241,7 @@ module.exports = {
     toggleUserActiveTransaction,
     createUserSessionTransaction,
     removeUsers,
+    removeUserByEmailId,
+    removeUserById,
     fetchUserByEmailTransaction,
 };

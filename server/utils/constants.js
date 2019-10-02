@@ -27,7 +27,7 @@ exports.sampleUserData4 = {
     userEmail: 'email4@domain.in',
     userPassword: 'Abc@1234',
     expectedPerDayIntakeCalorie: 1600.0,
-    isActive: false
+    isActive: true
 };
 
 exports.sampleMeal1 = {

@@ -19,7 +19,7 @@
     "http-errors": "~1.6.3",
     "mocha": "^9.0.3",
     "moment": "^2.24.0",
-    "mongoose": "^5.9.10",
+    "mongoose": "^5.13.7",
     "morgan": "~1.9.1",
     "node-cache": "^5.1.0",
     "nodemon": "^2.0.3",
